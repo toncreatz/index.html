@@ -1,0 +1,143 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bereken uw Besparing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+        }
+        label {
+            display: inline-block;
+            margin-top: 10px;
+        }
+        input[type="number"], input[type="text"] {
+            padding: 5px;
+            margin-top: 5px;
+            width: 100%;
+        }
+        .input-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .input-container label, .input-container input {
+            width: 30%;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #3aacf4;
+            color: white;
+            border: none;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #183055;
+        }
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        #chart-container {
+            margin-top: 30px;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <h2>Bereken uw minimale besparing per jaar</h2>
+
+    <div class="input-container">
+        <div>
+            <label for="orderAmount">Uw gemiddelde orderbedrag (€):</label>
+            <input type="number" id="orderAmount" placeholder="Bijvoorbeeld 25" required>
+        </div>
+        <div>
+            <label for="ordersPerDay">Aantal orders per dag via Thuisbezorgd:</label>
+            <input type="number" id="ordersPerDay" placeholder="Bijvoorbeeld 100" required>
+        </div>
+        <div>
+            <label for="commissionPercentage">Commissie Thuisbezorgd (%) :</label>
+            <input type="number" id="commissionPercentage" value="14" required>
+        </div>
+    </div>
+
+    <button onclick="calculateSavings()">Bereken Besparing</button>
+
+    <div class="result" id="result"></div>
+
+    <div id="chart-container">
+        <canvas id="savingsChart"></canvas>
+    </div>
+
+    <script>
+        var savingsChart;
+
+        function calculateSavings() {
+            // Verkrijg de invoer van de gebruiker
+            var orderAmount = parseFloat(document.getElementById("orderAmount").value);
+            var ordersPerDay = parseFloat(document.getElementById("ordersPerDay").value);
+            var commissionPercentage = parseFloat(document.getElementById("commissionPercentage").value);
+            
+            // Bereken de commissie per order
+            var commissionPerOrder = (commissionPercentage / 100) * orderAmount + 0.21;
+            
+            // Bereken de totale commissie per dag
+            var totalDailyCommission = commissionPerOrder * ordersPerDay;
+            
+            // Bereken de totale commissie per jaar
+            var totalAnnualCommission = totalDailyCommission * 365;
+            
+            // Toon het resultaat
+            document.getElementById("result").innerHTML = "MINIMALE BESPARING PER JAAR: €" + totalAnnualCommission.toFixed(2);
+            
+            // Graph data
+            var labels = ["Jaar 1", "Jaar 2", "Jaar 3", "Jaar 4", "Jaar 5"];
+            var savingsData = [];
+            var growthRate = 1.05; // 5% groei per jaar
+            var yearlySavings = totalAnnualCommission;
+            for (var i = 0; i < 5; i++) {
+                savingsData.push(yearlySavings);
+                yearlySavings *= growthRate;
+            }
+
+            // Update or create the chart
+            if (savingsChart) {
+                savingsChart.destroy();
+            }
+
+            var ctx = document.getElementById("savingsChart").getContext("2d");
+            savingsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Besparing per Jaar (€)',
+                        data: savingsData,
+                        borderColor: '#3aacf4',
+                        fill: false,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
