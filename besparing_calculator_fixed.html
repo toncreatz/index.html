@@ -86,6 +86,12 @@
             var orderAmount = parseFloat(document.getElementById("orderAmount").value);
             var ordersPerDay = parseFloat(document.getElementById("ordersPerDay").value);
             var commissionPercentage = parseFloat(document.getElementById("commissionPercentage").value);
+
+            // Controleer of alle waarden geldig zijn
+            if (isNaN(orderAmount) || isNaN(ordersPerDay) || isNaN(commissionPercentage)) {
+                document.getElementById("result").innerHTML = "Vul alle velden correct in.";
+                return;
+            }
             
             // Bereken de commissie per order
             var commissionPerOrder = (commissionPercentage / 100) * orderAmount + 0.21;
